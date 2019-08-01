@@ -8,9 +8,18 @@ clock = pygame.time.Clock()
 screensize = [800, 600]
 screen = pygame.display.set_mode(screensize)
 player_pos = [0, 0]
+size = 64
+title = pygame.transform.scale(
+    pygame.image.load(r'./res/glass.png'), (size, size))
 map = []
 window = 0
 running = True
+
+
+def newmap():
+    global map
+    map = [[1 for i in range(100)]for j in range(100)]
+
 
 while running:
     clock.tick(60)
@@ -26,10 +35,14 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
+                newmap()
                 window = 1
             if event.type == pygame.QUIT:
                 running = False
     elif window == 1:
+        for i in range(int(screensize[0]/size)+1):
+            for j in range(int(screensize[1]/size)+1):
+                screen.blit(title, (i*size, j*size))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
