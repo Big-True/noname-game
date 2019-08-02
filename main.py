@@ -9,8 +9,8 @@ screensize = [800, 600]
 screen = pygame.display.set_mode(screensize)
 player_pos = [0, 0]
 size = 64
-title = pygame.transform.scale(
-    pygame.image.load(r'./res/glass.png'), (size, size))
+titles = [pygame.transform.scale(
+    pygame.image.load(r'./res/glass.png'), (size, size))]
 map = []
 window = 0
 running = True
@@ -42,7 +42,7 @@ while running:
     elif window == 1:
         for i in range(int(screensize[0]/size)+1):
             for j in range(int(screensize[1]/size)+1):
-                screen.blit(title, (i*size, j*size))
+                screen.blit(titles[map[j][i]-1], (i*size, j*size))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
