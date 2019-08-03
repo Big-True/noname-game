@@ -1,4 +1,8 @@
 import pygame
+
+import blocks
+import random
+
 pygame.init()
 logo = pygame.image.load(r'./res/noname-game.ico')
 background = pygame.image.load(r'./res/background.png')
@@ -9,10 +13,8 @@ screensize = [800, 600]
 screen = pygame.display.set_mode(screensize)
 player_pos = [0, 0]
 size = 32
-speed = 5
-block_imgs = [pygame.transform.scale(
-    pygame.image.load(r'./res/glass.png'), (size, size)),pygame.transform.scale(
-    pygame.image.load(r'./res/player.png'), (size, size))]
+speed = 0.25
+block_imgs = [pygame.transform.scale(i.res, (size, size)) for i in blocks.block_res]
 player_img = pygame.transform.scale(
     pygame.image.load(r'./res/player.png'), (size, size))
 map = []
@@ -22,8 +24,8 @@ running = True
 
 def newmap():
     global map
-    map = [[1 for i in range(100)]for j in range(100)]
-    map[0][0]=2
+    map = [[random.randint(0,len(blocks.block_res)) for i in range(100)]for j in range(100)]
+    map[0][0] = 2
 
 
 while running:
@@ -47,7 +49,7 @@ while running:
     elif window == 1:
         for i in range(int(player_pos[0]-screensize[0]/2/size), int(player_pos[0]+screensize[0]/2/size)+1):
             for j in range(int(player_pos[1]-screensize[1]/2/size), int(player_pos[1]+screensize[1]/2/size)+1):
-                if i >= 0 and j >= 0 and i<len(map[0]) and j<len(map):
+                if i >= 0 and j >= 0 and i < len(map[0]) and j < len(map):
                     screen.blit(block_imgs[map[j][i]-1], ((i-player_pos[0])*size +
                                                           screensize[0]/2, (j-player_pos[1])*size+screensize[1]/2))
         screen.blit(
