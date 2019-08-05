@@ -25,3 +25,7 @@ class chunk_store:
 
     def get_block(self, x, y):
         return self.get_chunk(pos2chunkid(x), pos2chunkid(y)).surface_data[y % 10][x % 10]
+
+    def set_block(self, x, y, id):
+        self.get_chunk(pos2chunkid(x), pos2chunkid(
+            y)).surface_data[y % 10][x % 10] = id

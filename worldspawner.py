@@ -4,7 +4,7 @@ import blocks
 
 
 def spawner_default(x, y):
-    return [[random.randint(0, len(blocks.block_res)-1)for i in range(10)]for j in range(10)]
+    return [[random.randint(1, len(blocks.block_res)-1)for i in range(10)]for j in range(10)]
 
 
 def spawner_flat():
