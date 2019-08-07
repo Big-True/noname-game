@@ -10,10 +10,11 @@ class block:
 
 
 hole = block('hole')
-glass = block('glass')
+grass = block('grass')
 dirt = block('dirt')
 stone = block('stone')
-block_res = [hole, glass, dirt, stone]
+wood = block('wood')
+block_res = [hole, grass, dirt, stone, wood]
 tree = block('tree', 1, 2)
-tree2 = block('tree2', 1, 3)
-cover_res = [None, tree, tree2]
+cover_res = [None, None, None, None, tree]
+items = [None, grass, dirt, stone, tree]
