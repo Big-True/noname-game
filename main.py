@@ -18,10 +18,14 @@ size = 32
 speed = 0.1
 touch_len = 5.01
 pack = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
+now = 0
+choose = pygame.transform.smoothscale(
+    pygame.image.load(
+        r'./res/item choose.png'), (int(size*1.125), int(size*1.125)))
 bar = pygame.image.load(r'./res/item bar.png')
-block_imgs = [pygame.transform.scale(
+block_imgs = [pygame.transform.smoothscale(
     i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
-cover_imgs = [pygame.transform.scale(
+cover_imgs = [pygame.transform.smoothscale(
     i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.cover_res]
 cover_scale = [[i.width, i.height] if i != None else [None, None]
                for i in blocks.cover_res]
@@ -63,10 +67,12 @@ while running:
         screen.blit(
             player_img, ((screensize[0]-size)/2, (screensize[1]-size)/2))
         screen.blit(bar, (0, 0))
+        screen.blit(choose, (8+now*38, 7))
         for i in range(len(pack)):
             if pack[i][0] != 0:
-                screen.blit(block_imgs[pack[i][0]], (10+i*38,9))
-                screen.blit(font.render(str(pack[i][1]),True,(0,0,0)),(25+i*38,20))
+                screen.blit(block_imgs[pack[i][0]], (10+i*38, 9))
+                screen.blit(font.render(
+                    str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
         screen.blit(pos, (0, 568))
         key_pressed = pygame.key.get_pressed()
         if key_pressed[pygame.K_w]:
@@ -82,21 +88,37 @@ while running:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
+                t1 = (x-screensize[0]/2)/size+player_pos[0]
+                t2 = (screensize[1]/2-y)/size+player_pos[1]
+                t1 = int(t1-t1 % 1)
+                t2 = int(t2-t2 % 1)
                 if pow(x-screensize[0]/2, 2)+pow(y-screensize[1]/2, 2) < pow(touch_len*size, 2):
-                    t1 = (x-screensize[0]/2)/size+player_pos[0]
-                    t2 = (screensize[1]/2-y)/size+player_pos[1]
-                    itid = map.get_cover(int(t1-t1 % 1), int(t2-t2 % 1))
-                    if itid == 0:
-                        itid = map.get_block(int(t1-t1 % 1), int(t2-t2 % 1))
-                        map.set_block(int(t1-t1 % 1), int(t2-t2 % 1), 0)
-                    else:
-                        map.set_cover(int(t1-t1 % 1), int(t2-t2 % 1), 0)
-                    if itid != 0:
-                        for i in range(len(pack)):
-                            if pack[i][0] == itid:
-                                pack[i][1] += 1
-                                break
-                            if pack[i][0] == 0:
-                                pack[i] = [itid,1]
-                                break
+                    if event.button == 1:
+                        itid = map.get_cover(t1, t2)
+                        if itid == 0:
+                            itid = map.get_block(t1, t2)
+                            map.set_block(t1, t2, 0)
+                        else:
+                            map.set_cover(t1, t2, 0)
+                        if itid != 0:
+                            putted = False
+                            for i in range(len(pack)):
+                                if pack[i][0] == itid and not putted:
+                                    pack[i][1] += 1
+                                    putted = True
+                            for i in range(len(pack)):
+                                if pack[i][0] == 0 and not putted:
+                                    pack[i] = [itid, 1]
+                                    putted = True
+                    elif event.button == 3:
+                        if pack[now][0] != 0:
+                            if map.get_block(t1, t2) == 0:
+                                map.set_block(t1, t2, pack[now][0])
+                                pack[now][1] -= 1
+                                if pack[now][1] == 0:
+                                    pack[now][0] = 0
+                if event.button == 4:
+                    now = (now-1) % 5
+                if event.button == 5:
+                    now = (now+1) % 5
     pygame.display.flip()
