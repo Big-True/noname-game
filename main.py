@@ -34,6 +34,8 @@ player_img = pygame.transform.scale(
 map = chunks.chunk_store()
 window = 0
 running = True
+pause = False
+pause_img=pygame.image.load(r'./res/pause.png')
 
 while running:
     clock.tick(60)
@@ -74,51 +76,61 @@ while running:
                 screen.blit(font.render(
                     str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
         screen.blit(pos, (0, 568))
-        key_pressed = pygame.key.get_pressed()
-        if key_pressed[pygame.K_w]:
-            player_pos[1] += speed
-        if key_pressed[pygame.K_a]:
-            player_pos[0] -= speed
-        if key_pressed[pygame.K_s]:
-            player_pos[1] -= speed
-        if key_pressed[pygame.K_d]:
-            player_pos[0] += speed
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                t1 = (x-screensize[0]/2)/size+player_pos[0]
-                t2 = (screensize[1]/2-y)/size+player_pos[1]
-                t1 = int(t1-t1 % 1)
-                t2 = int(t2-t2 % 1)
-                if pow(x-screensize[0]/2, 2)+pow(y-screensize[1]/2, 2) < pow(touch_len*size, 2):
-                    if event.button == 1:
-                        itid = map.get_cover(t1, t2)
-                        if itid == 0:
-                            itid = map.get_block(t1, t2)
-                            map.set_block(t1, t2, 0)
-                        else:
-                            map.set_cover(t1, t2, 0)
-                        if itid != 0:
-                            putted = False
-                            for i in range(len(pack)):
-                                if pack[i][0] == itid and not putted:
-                                    pack[i][1] += 1
-                                    putted = True
-                            for i in range(len(pack)):
-                                if pack[i][0] == 0 and not putted:
-                                    pack[i] = [itid, 1]
-                                    putted = True
-                    elif event.button == 3:
-                        if pack[now][0] != 0:
-                            if map.get_block(t1, t2) == 0:
-                                map.set_block(t1, t2, pack[now][0])
-                                pack[now][1] -= 1
-                                if pack[now][1] == 0:
-                                    pack[now][0] = 0
-                if event.button == 4:
-                    now = (now-1) % 5
-                if event.button == 5:
-                    now = (now+1) % 5
+        if pause:
+            screen.blit(pause_img,(int((screensize[0]-400)/2),int((screensize[1]-400)/2)))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            if sum(pygame.key.get_pressed())+sum(pygame.mouse.get_pressed())!=0 and pygame.key.get_pressed()[pygame.K_ESCAPE]==0:
+                pause=False
+        else:
+            key_pressed = pygame.key.get_pressed()
+            if key_pressed[pygame.K_w]:
+                player_pos[1] += speed
+            if key_pressed[pygame.K_a]:
+                player_pos[0] -= speed
+            if key_pressed[pygame.K_s]:
+                player_pos[1] -= speed
+            if key_pressed[pygame.K_d]:
+                player_pos[0] += speed
+            if key_pressed[pygame.K_ESCAPE]:
+                pause=True
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    t1 = (x-screensize[0]/2)/size+player_pos[0]
+                    t2 = (screensize[1]/2-y)/size+player_pos[1]
+                    t1 = int(t1-t1 % 1)
+                    t2 = int(t2-t2 % 1)
+                    if pow(x-screensize[0]/2, 2)+pow(y-screensize[1]/2, 2) < pow(touch_len*size, 2):
+                        if event.button == 1:
+                            itid = map.get_cover(t1, t2)
+                            if itid == 0:
+                                itid = map.get_block(t1, t2)
+                                map.set_block(t1, t2, 0)
+                            else:
+                                map.set_cover(t1, t2, 0)
+                            if itid != 0:
+                                putted = False
+                                for i in range(len(pack)):
+                                    if pack[i][0] == itid and not putted:
+                                        pack[i][1] += 1
+                                        putted = True
+                                for i in range(len(pack)):
+                                    if pack[i][0] == 0 and not putted:
+                                        pack[i] = [itid, 1]
+                                        putted = True
+                        elif event.button == 3:
+                            if pack[now][0] != 0:
+                                if map.get_block(t1, t2) == 0:
+                                    map.set_block(t1, t2, pack[now][0])
+                                    pack[now][1] -= 1
+                                    if pack[now][1] == 0:
+                                        pack[now][0] = 0
+                    if event.button == 4:
+                        now = (now-1) % 5
+                    if event.button == 5:
+                        now = (now+1) % 5
     pygame.display.flip()
