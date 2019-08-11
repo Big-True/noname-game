@@ -77,7 +77,7 @@ while running:
                 screen.blit(block_imgs[pack[i][0]], (10+i*38, 9))
                 screen.blit(font.render(
                     str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
-        screen.blit(pos, (0, 568))
+        screen.blit(pos, (0, screensize[1]-32))
         if pause:
             screen.blit(
                 pause_img, (int((screensize[0]-400)/2), int((screensize[1]-400)/2)))
