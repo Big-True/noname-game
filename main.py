@@ -74,7 +74,7 @@ while running:
         screen.blit(choose, (8+now*38, 7))
         for i in range(len(pack)):
             if pack[i][0] != 0:
-                screen.blit(block_imgs[pack[i][0]], (10+i*38, 9))
+                screen.blit(pygame.transform.smoothscale(blocks.block_res[pack[i][0]].res,(32,32)), (10+i*38, 9))
                 screen.blit(font.render(
                     str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
         screen.blit(pos, (0, screensize[1]-32))
@@ -104,7 +104,7 @@ while running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_MINUS:
-                        size = int(size/2) if size >= 2 else 2
+                        size = int(size/2) if size >= 8 else 4
                         block_imgs = [pygame.transform.smoothscale(
                             i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
                         cover_imgs = [pygame.transform.smoothscale(
