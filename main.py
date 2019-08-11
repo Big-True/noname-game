@@ -12,7 +12,7 @@ pygame.display.set_icon(logo)
 pygame.display.set_caption('noname game')
 clock = pygame.time.Clock()
 screensize = [800, 600]
-screen = pygame.display.set_mode(screensize)
+screen = pygame.display.set_mode(screensize, pygame.RESIZABLE)
 player_pos = [0, 0]
 size = 32
 speed = 0.1
@@ -35,25 +35,27 @@ map = chunks.chunk_store()
 window = 0
 running = True
 pause = False
-pause_img=pygame.image.load(r'./res/pause.png')
+pause_img = pygame.image.load(r'./res/pause.png')
 
 while running:
     clock.tick(60)
     screen.fill((0, 0, 0))
     if window == 0:
         if screensize[0]/1920 < screensize[1]/1080:
-            background = pygame.transform.scale(
-                background, (screensize[0], int(screensize[0]/16*9)))
+            screen.blit(pygame.transform.scale(
+                background, (screensize[0], int(screensize[0]/16*9))), (0, 0))
         else:
-            background = pygame.transform.scale(
-                background, (int(screensize[1]/9*16), screensize[1]))
-        screen.blit(background, (0, 0))
+            screen.blit(pygame.transform.scale(
+                background, (int(screensize[1]/9*16), screensize[1])), (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 window = 1
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.VIDEORESIZE:
+                screensize = event.size
+                screen = pygame.display.set_mode(screensize, pygame.RESIZABLE)
     elif window == 1:
         pos = font.render('(%.2f,%.2f)' %
                           (player_pos[0], player_pos[1]), True, (0, 0, 0))
@@ -77,12 +79,16 @@ while running:
                     str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
         screen.blit(pos, (0, 568))
         if pause:
-            screen.blit(pause_img,(int((screensize[0]-400)/2),int((screensize[1]-400)/2)))
+            screen.blit(
+                pause_img, (int((screensize[0]-400)/2), int((screensize[1]-400)/2)))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            if sum(pygame.key.get_pressed())+sum(pygame.mouse.get_pressed())!=0 and pygame.key.get_pressed()[pygame.K_ESCAPE]==0:
-                pause=False
+                if event.type == pygame.VIDEORESIZE:
+                    screensize = event.size
+                    screen = pygame.display.set_mode(screensize)
+            if sum(pygame.key.get_pressed())+sum(pygame.mouse.get_pressed()) != 0 and pygame.key.get_pressed()[pygame.K_ESCAPE] == 0:
+                pause = False
         else:
             key_pressed = pygame.key.get_pressed()
             if key_pressed[pygame.K_w]:
@@ -94,10 +100,31 @@ while running:
             if key_pressed[pygame.K_d]:
                 player_pos[0] += speed
             if key_pressed[pygame.K_ESCAPE]:
-                pause=True
+                pause = True
             for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_MINUS:
+                        size = int(size/2) if size >= 2 else 2
+                        block_imgs = [pygame.transform.smoothscale(
+                            i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
+                        cover_imgs = [pygame.transform.smoothscale(
+                            i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.cover_res]
+                        player_img = pygame.transform.scale(
+                            pygame.image.load(r'./res/player.png'), (size, size))
+                    if event.key == pygame.K_EQUALS:
+                        size = size*2
+                        block_imgs = [pygame.transform.smoothscale(
+                            i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
+                        cover_imgs = [pygame.transform.smoothscale(
+                            i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.cover_res]
+                        player_img = pygame.transform.scale(
+                            pygame.image.load(r'./res/player.png'), (size, size))
                 if event.type == pygame.QUIT:
                     running = False
+                if event.type == pygame.VIDEORESIZE:
+                    screensize = event.size
+                    screen = pygame.display.set_mode(
+                        screensize, pygame.RESIZABLE)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = event.pos
                     t1 = (x-screensize[0]/2)/size+player_pos[0]
