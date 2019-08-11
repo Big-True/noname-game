@@ -112,7 +112,7 @@ while running:
                         player_img = pygame.transform.scale(
                             pygame.image.load(r'./res/player.png'), (size, size))
                     if event.key == pygame.K_EQUALS:
-                        size = size*2
+                        size = size*2 if size<128 else 128
                         block_imgs = [pygame.transform.smoothscale(
                             i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
                         cover_imgs = [pygame.transform.smoothscale(
