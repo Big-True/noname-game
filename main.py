@@ -8,6 +8,7 @@ pygame.init()
 logo = pygame.image.load(r'./res/noname-game.ico')
 font = pygame.font.Font("./FZMW.TTF", 32)
 background = pygame.image.load(r'./res/background.png')
+menu_img = pygame.image.load(r'./res/menu.png')
 pygame.display.set_icon(logo)
 pygame.display.set_caption('noname game')
 clock = pygame.time.Clock()
@@ -31,7 +32,7 @@ cover_scale = [[i.width, i.height] if i != None else [None, None]
                for i in blocks.cover_res]
 player_img = pygame.transform.scale(
     pygame.image.load(r'./res/player.png'), (size, size))
-map = chunks.chunk_store()
+map = None
 window = 0
 running = True
 pause = False
@@ -41,7 +42,7 @@ while running:
     clock.tick(60)
     screen.fill((0, 0, 0))
     if window == 0:
-        if screensize[0]/1920 < screensize[1]/1080:
+        if screensize[0]/16 < screensize[1]/9:
             screen.blit(pygame.transform.scale(
                 background, (screensize[0], int(screensize[0]/16*9))), (0, 0))
         else:
@@ -49,7 +50,6 @@ while running:
                 background, (int(screensize[1]/9*16), screensize[1])), (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
                 window = 1
             if event.type == pygame.QUIT:
                 running = False
@@ -57,6 +57,21 @@ while running:
                 screensize = event.size
                 screen = pygame.display.set_mode(screensize, pygame.RESIZABLE)
     elif window == 1:
+        screen.blit(menu_img, (int((screensize[0]-800)/2), 0))
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if x > screensize[0]/2:
+                    map = chunks.chunk_store('normal')
+                else:
+                    map = chunks.chunk_store('flat')
+                window = 2
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.VIDEORESIZE:
+                screensize = event.size
+                screen = pygame.display.set_mode(screensize, pygame.RESIZABLE)
+    elif window == 2:
         pos = font.render('(%.2f,%.2f)' %
                           (player_pos[0], player_pos[1]), True, (0, 0, 0))
         for i in range(int(player_pos[0]-screensize[0]/2/size)-1, int(player_pos[0]+screensize[0]/2/size)+1):
@@ -74,7 +89,8 @@ while running:
         screen.blit(choose, (8+now*38, 7))
         for i in range(len(pack)):
             if pack[i][0] != 0:
-                screen.blit(pygame.transform.smoothscale(blocks.block_res[pack[i][0]].res,(32,32)), (10+i*38, 9))
+                screen.blit(pygame.transform.smoothscale(
+                    blocks.block_res[pack[i][0]].res, (32, 32)), (10+i*38, 9))
                 screen.blit(font.render(
                     str(pack[i][1]), True, (0, 0, 0)), (25+i*38, 20))
         screen.blit(pos, (0, screensize[1]-32))
@@ -112,7 +128,7 @@ while running:
                         player_img = pygame.transform.scale(
                             pygame.image.load(r'./res/player.png'), (size, size))
                     if event.key == pygame.K_EQUALS:
-                        size = size*2 if size<128 else 128
+                        size = size*2 if size < 128 else 128
                         block_imgs = [pygame.transform.smoothscale(
                             i.res, (size*i.width, size*i.height)) if i != None else None for i in blocks.block_res]
                         cover_imgs = [pygame.transform.smoothscale(
